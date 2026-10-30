@@ -18,3 +18,4 @@ router.route('/:id')
   .delete(protect, adminOnly, deleteShow);
 
 export default router;
+

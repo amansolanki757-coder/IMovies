@@ -140,3 +140,4 @@ export const releaseSeats = async (req, res, next) => {
     next(error);
   }
 };
+

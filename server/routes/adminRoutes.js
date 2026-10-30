@@ -7,3 +7,4 @@ const router = express.Router();
 router.get('/stats', protect, adminOnly, getAdminStats);
 
 export default router;
+

@@ -13,3 +13,4 @@ router.put('/:id/read', protect, markAsRead);
 router.put('/read-all', protect, markAllAsRead);
 
 export default router;
+

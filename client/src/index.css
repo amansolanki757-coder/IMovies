@@ -1,111 +1,237 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'react-toastify/dist/ReactToastify.css';
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --bg-primary: #0a0c10;
+  --bg-surface: #121620;
+  --bg-card: rgba(22, 27, 39, 0.75);
+  --bg-card-hover: rgba(30, 36, 52, 0.85);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(229, 9, 20, 0.4);
+  --primary-red: #e50914;
+  --primary-red-hover: #f40612;
+  --accent-gold: #ffb703;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --seat-avail: #252d3d;
+  --seat-selected: #e50914;
+  --seat-locked: #d97706;
+  --seat-booked: #334155;
+  --seat-vip: #7c3aed;
+  --seat-prime: #0284c7;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+/* Custom Cinema Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+::-webkit-scrollbar-track {
+  background: #0a0c10;
 }
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
+::-webkit-scrollbar-thumb {
+  background: #1e2432;
   border-radius: 4px;
-  color: var(--text-h);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-red);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
+/* Glassmorphism Cards */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  transition: all 0.25s ease-in-out;
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.6), 0 0 16px rgba(229, 9, 20, 0.18);
+  border-color: var(--border-glow);
+}
+
+/* Primary Cinema Button */
+.btn-cinema {
+  background: linear-gradient(135deg, #e50914, #b20710);
+  color: #ffffff !important;
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: 8px;
+  padding: 10px 22px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.35);
+}
+
+.btn-cinema:hover {
+  background: linear-gradient(135deg, #f40612, #c50813);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.55);
+}
+
+.btn-cinema-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-cinema-outline:hover {
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+  background: rgba(229, 9, 20, 0.08);
+}
+
+/* Curved Cinema Screen */
+.screen-curve {
+  width: 75%;
+  height: 18px;
+  margin: 0 auto 35px auto;
+  border-top: 5px solid #00f2fe;
+  border-radius: 50% / 100% 100% 0 0;
+  box-shadow: 0 -12px 25px -4px rgba(0, 242, 254, 0.45);
+  position: relative;
+  text-align: center;
+}
+
+.screen-text {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+/* Cinema Seat Design */
+.cinema-seat {
+  width: 32px;
+  height: 30px;
+  border-radius: 6px 6px 3px 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  margin: 4px;
+}
+
+.seat-available {
+  background: var(--seat-avail);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seat-available:hover {
+  background: #3b4559;
+  color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.seat-selected {
+  background: var(--seat-selected) !important;
+  color: #fff !important;
+  border: 1px solid #ff4d4d !important;
+  transform: scale(1.1);
+  box-shadow: 0 0 14px rgba(229, 9, 20, 0.8) !important;
+}
+
+.seat-locked {
+  background: var(--seat-locked) !important;
+  color: #fff !important;
+  border: 1px solid #f59e0b !important;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.seat-booked {
+  background: var(--seat-booked) !important;
+  color: #64748b !important;
+  border: 1px solid transparent !important;
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Glow Pill Badges */
+.badge-pill-custom {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  transition: all 0.2s ease;
+}
+
+.badge-pill-custom.active,
+.badge-pill-custom:hover {
+  background: var(--primary-red);
+  color: #ffffff;
+  border-color: var(--primary-red);
+  cursor: pointer;
+}
+
+/* Rating Tag */
+.rating-tag {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
   padding: 4px 8px;
-  background: var(--code-bg);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fbbf24;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Digital Ticket Hologram / Border */
+.ticket-pass {
+  background: linear-gradient(145deg, #161b26, #0e121a);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ticket-pass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #e50914, #ffb703, #e50914);
 }

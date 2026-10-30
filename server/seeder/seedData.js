@@ -254,3 +254,4 @@ export const seedDatabase = async () => {
     console.error('[Seeder Error]', error);
   }
 };
+

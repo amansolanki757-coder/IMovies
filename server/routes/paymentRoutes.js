@@ -8,3 +8,4 @@ router.post('/process', protect, processPayment);
 router.get('/booking/:bookingId', protect, getPaymentByBooking);
 
 export default router;
+

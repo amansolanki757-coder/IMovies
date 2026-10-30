@@ -64,3 +64,4 @@ export const markAllAsRead = async (req, res, next) => {
     next(error);
   }
 };
+

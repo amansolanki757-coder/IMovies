@@ -9,3 +9,4 @@ router.post('/lock', protect, lockSeats);
 router.post('/release', protect, releaseSeats);
 
 export default router;
+

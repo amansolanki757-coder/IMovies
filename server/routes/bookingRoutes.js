@@ -17,3 +17,4 @@ router.get('/:id', protect, getBookingById);
 router.post('/:id/cancel', protect, cancelBooking);
 
 export default router;
+

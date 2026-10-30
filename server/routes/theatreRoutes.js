@@ -20,3 +20,4 @@ router.route('/:id')
   .delete(protect, adminOnly, deleteTheatre);
 
 export default router;
+
