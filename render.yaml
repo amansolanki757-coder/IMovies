@@ -3,7 +3,7 @@ services:
     name: imovies-cinema
     env: node
     plan: free
-    buildCommand: npm install && npm install --prefix server && npm run build
+    buildCommand: cd client && npm install && npm run build && cd ../server && npm install
     startCommand: node server/server.js
     envVars:
       - key: NODE_ENV
@@ -14,4 +14,3 @@ services:
         generateValue: true
       - key: MONGO_URI
         sync: false
-
