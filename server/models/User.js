@@ -5,31 +5,41 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please provide a name'],
+      required: [true, 'Please provide your full name'],
       trim: true,
+      minlength: [2, 'Name must be at least 2 characters long'],
       maxlength: [50, 'Name cannot exceed 50 characters'],
     },
     email: {
       type: String,
-      required: [true, 'Please provide an email'],
+      required: [true, 'Please provide an email address'],
       unique: true,
       lowercase: true,
       trim: true,
       match: [
-        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        'Please provide a valid email',
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        'Please provide a valid email address (e.g. user@domain.com)',
       ],
       index: true,
     },
     password: {
       type: String,
       required: [true, 'Please provide a password'],
-      minlength: [6, 'Password must be at least 6 characters'],
+      minlength: [6, 'Password must be at least 6 characters long'],
       select: false,
     },
     phone: {
       type: String,
       default: '',
+      validate: {
+        validator: function (v) {
+          if (!v || v.trim() === '') return true; // Phone is optional
+          // Must contain 10-15 digits only, no letters
+          const cleaned = v.replace(/[\s+-]/g, '');
+          return /^\d{10,15}$/.test(cleaned);
+        },
+        message: 'Mobile number must contain valid digits only (no letters or symbols)',
+      },
     },
     role: {
       type: String,
@@ -63,4 +73,3 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 };
 
 export default mongoose.model('User', userSchema);
-

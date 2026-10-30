@@ -19,6 +19,9 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
     localStorage.setItem('imovies_token', res.data.token);
     return res.data;
   } catch (error) {
+    if (!error.response) {
+      return rejectWithValue('Cannot reach IMovies server on port 5000. Please ensure the backend is started.');
+    }
     return rejectWithValue(error.response?.data?.message || 'Login failed');
   }
 });
@@ -30,6 +33,9 @@ export const registerUser = createAsyncThunk('auth/register', async (userData, {
     localStorage.setItem('imovies_token', res.data.token);
     return res.data;
   } catch (error) {
+    if (!error.response) {
+      return rejectWithValue('Cannot reach IMovies server on port 5000. Please ensure the backend is started.');
+    }
     return rejectWithValue(error.response?.data?.message || 'Registration failed');
   }
 });
@@ -68,7 +74,7 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.isAuthenticated = true;
       })
-      .addCase(loadUser.rejected, (state, action) => {
+      .addCase(loadUser.rejected, (state) => {
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
@@ -108,4 +114,3 @@ const authSlice = createSlice({
 
 export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;
-

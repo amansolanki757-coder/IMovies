@@ -9,36 +9,70 @@ const generateToken = (id, role) => {
   );
 };
 
-// @desc    Register a new user
+// @desc    Register a new user with detailed validation
 // @route   POST /api/auth/register
 // @access  Public
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, phone, role } = req.body;
 
-    if (!name || !email || !password) {
+    // 1. Name Validation
+    if (!name || name.trim().length < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, email, and password',
+        field: 'name',
+        message: 'Please provide your full name (minimum 2 characters)',
       });
     }
 
-    const existingUser = await User.findOne({ email });
+    // 2. Email Validation
+    if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.trim())) {
+      return res.status(400).json({
+        success: false,
+        field: 'email',
+        message: 'Please enter a valid email address (e.g., student@medicaps.ac.in)',
+      });
+    }
+
+    // 3. Password Validation
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        field: 'password',
+        message: 'Password must be at least 6 characters long',
+      });
+    }
+
+    // 4. Mobile Phone Validation (If entered, must be digits only)
+    if (phone && phone.trim() !== '') {
+      const cleanedPhone = phone.replace(/[\s+-]/g, '');
+      if (!/^\d{10,15}$/.test(cleanedPhone) || /[a-zA-Z]/.test(phone)) {
+        return res.status(400).json({
+          success: false,
+          field: 'phone',
+          message: `Invalid mobile number "${phone}". It must contain 10-15 digits only, with no letters or special symbols.`,
+        });
+      }
+    }
+
+    // 5. Duplicate Email Check
+    const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User with this email already exists',
+        field: 'email',
+        message: 'An account with this email already exists. Please sign in or use another email.',
       });
     }
 
-    // Default to 'user' role unless specified admin and permitted
+    // Role assignment
     const userRole = role === 'admin' ? 'admin' : 'user';
 
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
       password,
-      phone: phone || '',
+      phone: phone ? phone.trim() : '',
       role: userRole,
     });
 
@@ -46,7 +80,7 @@ export const register = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful',
+      message: 'Account registered successfully!',
       token,
       user: {
         _id: user._id,
@@ -71,15 +105,15 @@ export const login = async (req, res, next) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password',
+        message: 'Please enter both your email and password',
       });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password',
+        message: 'Invalid credentials: No account found with this email',
       });
     }
 
@@ -87,7 +121,7 @@ export const login = async (req, res, next) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password',
+        message: 'Invalid credentials: Password does not match',
       });
     }
 
@@ -134,7 +168,15 @@ export const updateProfile = async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (name) user.name = name;
-    if (phone !== undefined) user.phone = phone;
+    if (phone !== undefined) {
+      if (phone && !/^\d{10,15}$/.test(phone.replace(/[\s+-]/g, ''))) {
+        return res.status(400).json({
+          success: false,
+          message: 'Phone must contain 10-15 digits only',
+        });
+      }
+      user.phone = phone;
+    }
 
     await user.save();
 
@@ -153,4 +195,3 @@ export const updateProfile = async (req, res, next) => {
     next(error);
   }
 };
-
