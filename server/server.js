@@ -4,6 +4,8 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
+import mongoose from 'mongoose';
 import rateLimit from 'express-rate-limit';
 
 import { connectDB } from './config/db.js';
@@ -27,7 +29,7 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io configuration with permissive CORS for client development
+// Socket.io configuration with permissive CORS
 const io = new Server(server, {
   cors: {
     origin: '*',
@@ -49,7 +51,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Rate Limiter: 100 requests per 15 minutes window
+// Rate Limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 150,
@@ -64,6 +66,9 @@ app.use('/api', limiter);
 
 // Serve uploaded movie posters statically
 const uploadPath = path.resolve('uploads');
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
 app.use('/uploads', express.static(uploadPath));
 
 // Health check endpoint
@@ -72,6 +77,7 @@ app.get('/api/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date(),
     service: 'IMovies REST & WebSocket Server',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
   });
 });
 
@@ -86,6 +92,18 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 
+// In production, serve the compiled frontend React app
+const clientDistPath = path.resolve('../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      return res.sendFile(path.join(clientDistPath, 'index.html'));
+    }
+    next();
+  });
+}
+
 // Centralized error handling
 app.use(errorHandler);
 
@@ -94,7 +112,9 @@ const PORT = process.env.PORT || 5000;
 // Connect DB & start server
 const startServer = async () => {
   await connectDB();
-  await seedDatabase();
+  if (mongoose.connection.readyState === 1) {
+    await seedDatabase();
+  }
 
   server.listen(PORT, () => {
     console.log(`===============================================`);
@@ -108,4 +128,3 @@ const startServer = async () => {
 startServer();
 
 export { app, server, io };
-

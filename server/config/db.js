@@ -1,38 +1,27 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-
-let mongoMemoryServer = null;
 
 export const connectDB = async () => {
-  try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/imovies';
-    
-    // Attempt standard connection with 2s timeout
-    try {
-      const conn = await mongoose.connect(mongoUri, {
-        serverSelectionTimeoutMS: 2000,
-      });
-      console.log(`[Database] MongoDB Connected to host: ${conn.connection.host}`);
-      return;
-    } catch (directConnErr) {
-      console.log('[Database] Local/remote MongoDB unreachable. Initializing in-memory database fallback...');
-    }
+  const mongoUri = process.env.MONGO_URI;
 
-    // Launch zero-configuration embedded in-memory MongoDB
-    mongoMemoryServer = await MongoMemoryServer.create();
-    const memoryUri = mongoMemoryServer.getUri();
-    const conn = await mongoose.connect(memoryUri);
-    console.log(`[Database] In-Memory MongoDB running at: ${memoryUri}`);
+  if (!mongoUri) {
+    console.warn('⚠️ [Database] No MONGO_URI provided in .env.');
+    console.warn('👉 Please add your MongoDB Atlas connection string to server/.env to enable database operations.');
+    return;
+  }
+
+  try {
+    const conn = await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    console.log(`===============================================`);
+    console.log(`🍃 [Database] MongoDB Connected to: ${conn.connection.host}`);
+    console.log(`===============================================`);
   } catch (error) {
-    console.error(`[Database Error] ${error.message}`);
-    process.exit(1);
+    console.error(`❌ [Database Connection Error]: ${error.message}`);
+    console.warn('👉 Please verify your MONGO_URI, network connection, or Atlas IP whitelist (0.0.0.0/0).');
   }
 };
 
 export const closeDB = async () => {
   await mongoose.connection.close();
-  if (mongoMemoryServer) {
-    await mongoMemoryServer.stop();
-  }
 };
-
