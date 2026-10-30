@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api'),
 });
 
 // Interceptor to attach JWT token to every outgoing request
@@ -14,4 +14,3 @@ API.interceptors.request.use((config) => {
 });
 
 export default API;
-

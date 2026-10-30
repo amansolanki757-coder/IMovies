@@ -7,7 +7,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || (import.meta.env.PROD ? '/' : 'http://localhost:5000');
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });
@@ -31,4 +31,3 @@ export const SocketProvider = ({ children }) => {
 };
 
 export const useSocket = () => useContext(SocketContext);
-

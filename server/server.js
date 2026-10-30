@@ -5,6 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import rateLimit from 'express-rate-limit';
 
@@ -25,6 +26,9 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 const server = http.createServer(app);
@@ -93,7 +97,14 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 
 // In production, serve the compiled frontend React app
-const clientDistPath = path.resolve('../client/dist');
+// Robust static path discovery for client/dist across local and cloud environments
+let clientDistPath = path.resolve(__dirname, '../client/dist');
+if (!fs.existsSync(clientDistPath)) {
+  clientDistPath = path.resolve('client/dist');
+}
+
+console.log(`[Static] Client build location: ${clientDistPath} (Exists: ${fs.existsSync(clientDistPath)})`);
+
 if (fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath));
   app.use((req, res, next) => {
