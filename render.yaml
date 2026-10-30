@@ -14,3 +14,4 @@ services:
         generateValue: true
       - key: MONGO_URI
         sync: false
+

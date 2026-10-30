@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const connectDB = async () => {
   const mongoUri = process.env.MONGO_URI;
@@ -11,10 +13,10 @@ export const connectDB = async () => {
 
   try {
     const conn = await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
     });
     console.log(`===============================================`);
-    console.log(`🍃 [Database] MongoDB Connected to: ${conn.connection.host}`);
+    console.log(`🍃 [Database] MongoDB Atlas Connected to: ${conn.connection.host}`);
     console.log(`===============================================`);
   } catch (error) {
     console.error(`❌ [Database Connection Error]: ${error.message}`);
